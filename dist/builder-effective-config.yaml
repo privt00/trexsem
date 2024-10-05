@@ -3,11 +3,19 @@ directories:
   buildResources: build
 appId: com.trexsem
 productName: TrexSem
-mac:
-  icon: build/icon.icns
 win:
+  target:
+    - target: nsis
+      arch:
+        - x64
   icon: build/icon.ico
 linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
   icon: build/icon.png
+mac:
+  icon: build/icon.icns
 files: []
 electronVersion: 32.1.2
