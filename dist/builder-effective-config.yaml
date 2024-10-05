@@ -1,0 +1,13 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.trexsem.wallet
+productName: TrexSem
+mac:
+  icon: build/icon.icns
+win:
+  icon: build/icon.ico
+linux:
+  icon: build/icon.png
+files: []
+electronVersion: 32.1.2

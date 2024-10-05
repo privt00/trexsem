@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TreXsem 0.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #1F2937;
+        }
+
+        .topbar {
+            background-color: #1F2937;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            -webkit-app-region: drag;
+        }
+
+        .window-container {
+            background-color: #1F2937;
+            border-radius: 50px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #close-app {
+            background-color: rgb(255, 65, 65);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .container2 {
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body class="overflow-y-hidden">
+
+    <section class="windows-container text-gray-800 min-h-screen flex bg-neutral-900 rounded-lg" style="-webkit-user-drag: none;">
+
+        <div class="sidebar flex flex-col justify-between p-4 rounded-l-lg">
+            <div>
+                <h2 class="text-white text-lg font-semibold mb-4">Wallets</h2>
+                <div id="wallet-list" class="space-y-2"></div>
+            </div>
+            <button id="create-wallet-btn" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-2xl">
+                + Create Wallet
+            </button>
+        </div>
+    
+        <div class="container mx-auto wallet-container flex-grow">
+            <div class="topbar w-full rounded-tr-lg">
+                <div class="flex justify-center">
+                    <img src="https://i.imgur.com/VVsFmn6.png" width="100" alt="TreXsem Logo">
+                </div>
+                <div class="p-1" style="-webkit-app-region: no-drag">
+                <button id="close-app" onclick="closeApp()" class="hover:bg-red-600 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                    &times;
+                </button>
+            </div>
+            </div>
+
+            <div class="container2 p-6">
+        
+                <div id="wallet-info" class="mb-8 bg-white p-6 rounded-lg shadow-lg hidden">
+                    <div id="balance-info" class="space-y-2"></div>
+                    <button id="refresh-balance" class="mt-4 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg shadow transition">
+                        Refresh Balance
+                    </button>
+                </div>
+        
+                <div id="transfer-form" class="mb-8 hidden">
+                    <h2 class="text-2xl text-neutral-400 font-bold mb-4 text-center">Transfer Funds</h2>
+                    <input id="receiver" type="text" placeholder="Receiver address" class="w-full bg-gray-50 border border-gray-300 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <input id="amount" type="number" placeholder="Amount" class="w-full bg-gray-50 border border-gray-300 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <button id="transfer-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                        Transfer
+                    </button>
+                </div>
+        
+                <div id="transaction-history" class="mb-8 hidden">
+                    <h2 class="text-2xl text-neutral-400 font-bold mb-4 text-center">Transaction History</h2>
+                    <ul id="transactions-list" class="space-y-2"></ul>
+                </div>
+        
+                <div id="custom-alert" class="hidden fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                    <div class="bg-white p-4 rounded-lg shadow-lg">
+                        <h3 id="alert-title" class="text-lg font-semibold"></h3>
+                        <p id="alert-message" class="text-gray-700"></p>
+                        <button id="alert-ok" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg mt-2">OK</button>
+                    </div>
+                </div>
+        
+                <div id="loading-spinner" class="loading-spinner mx-auto"></div>
+
+            </div>
+        </div>
+    
+        <div id="wallet-name-modal" class="modal">
+            <div class="modal-content bg-white p-6 rounded-lg">
+                <h2 class="text-xl font-bold mb-4">Enter Wallet Name</h2>
+                <input id="wallet-name" type="text" placeholder="Wallet Name" class="w-full bg-gray-50 border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <div class="flex justify-end mt-4">
+                    <button id="confirm-wallet-name" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg">Create Wallet</button>
+                    <button id="close-modal" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg ml-2">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.getElementById('close-app').onclick = () => {
+            window.electron.invoke('close-app');
+        };
+
+        const createWalletBtn = document.getElementById('create-wallet-btn');
+        const walletNameModal = document.getElementById('wallet-name-modal');
+        const confirmWalletName = document.getElementById('confirm-wallet-name');
+        const closeModal = document.getElementById('close-modal');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const walletList = document.getElementById('wallet-list');
+        const transactionHistory = document.getElementById('transaction-history');
+        const transactionsList = document.getElementById('transactions-list');
+        const transferForm = document.getElementById('transfer-form');
+
+        (async () => {
+            const wallets = await window.electron.invoke('load-wallets');
+            wallets.forEach(wallet => {
+                walletList.innerHTML += `
+                    <div class="bg-gray-800 text-white p-2 rounded-lg flex justify-between">
+                        <span>${wallet.name}</span>
+                        <button class="bg-red-600 text-white px-2 rounded-lg" data-address="${wallet.address}">Load</button>
+                    </div>
+                `;
+            });
+        })();
+
+        createWalletBtn.onclick = () => {
+            walletNameModal.style.display = 'block';
+        };
+
+        closeModal.onclick = () => {
+            walletNameModal.style.display = 'none';
+        };
+
+        confirmWalletName.onclick = async () => {
+            const walletName = document.getElementById('wallet-name').value.trim();
+            if (!walletName) {
+                showAlert('Error', 'Please enter a wallet name.');
+                return;
+            }
+
+            showLoading();
+            try {
+                const wallet = await window.electron.invoke('create-wallet', walletName);
+                walletList.innerHTML += `
+                    <div class="bg-gray-800 text-white p-2 rounded-lg flex justify-between">
+                        <span>${wallet.name} (${wallet.address})</span>
+                        <button class="bg-red-600 text-white px-2 rounded-lg" data-address="${wallet.address}">Load</button>
+                    </div>
+                `;
+                document.getElementById('wallet-name').value = '';
+                walletNameModal.style.display = 'none';
+            } catch (error) {
+                showAlert('Error', error.message);
+            } finally {
+                hideLoading();
+            }
+        };
+
+        walletList.onclick = async (event) => {
+            if (event.target.matches('[data-address]')) {
+                const address = event.target.getAttribute('data-address');
+                showLoading();
+                try {
+                    const wallet = await window.electron.invoke('get-wallet', address);
+                    displayWalletInfo(wallet);
+                    await loadTransactionHistory(address);
+                } catch (error) {
+                    showAlert('Error', error.message);
+                } finally {
+                    hideLoading();
+                }
+            }
+        };
+
+        function displayWalletInfo(wallet) {
+            const walletInfo = document.getElementById('wallet-info');
+            const balanceInfo = document.getElementById('balance-info');
+            balanceInfo.innerHTML = '';
+            balanceInfo.innerHTML += `
+                <h3 class="font-semibold">Wallet Address:</h3>
+                <p>${wallet.address}</p>
+                <h3 class="font-semibold">Balance:</h3>
+                <p>${wallet.xpl} XPL</p>
+                <p>${wallet.xrs} XRS</p>
+            `;
+            walletInfo.classList.remove('hidden');
+            transferForm.classList.remove('hidden');
+        }
+
+        async function loadTransactionHistory(address) {
+            showLoading();
+            try {
+                const transactions = await window.electron.invoke('get-transactions', address);
+                displayTransactionHistory(transactions);
+                transactionHistory.classList.remove('hidden');
+            } catch (error) {
+                showAlert('Error', error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayTransactionHistory(transactions) {
+            transactionsList.innerHTML = '';
+            transactions.forEach(tx => {
+                transactionsList.innerHTML += `
+                    <li class="bg-gray-800 text-white p-2 rounded-lg">
+                        <strong>Sender:</strong> ${tx.senderId} <br>
+                        <strong>Amount:</strong> ${tx.amount} ${tx.currency} <br>
+                        <strong>Date:</strong>  ${new Date(tx.timestamp).toLocaleString()}
+                    </li>
+                `;
+            });
+        }
+
+        document.getElementById('transfer-btn').onclick = async () => {
+            const receiver = document.getElementById('receiver').value.trim();
+            const amount = document.getElementById('amount').value;
+
+            if (!receiver || !amount) {
+                showAlert('Error', 'Please enter a receiver address and amount.');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await window.electron.invoke('transfer-funds', {
+                    receiver,
+                    amount
+                });
+                showAlert('Success', response.message);
+                await loadTransactionHistory(response.address);
+            } catch (error) {
+                showAlert('Error', error.message);
+            } finally {
+                hideLoading();
+            }
+        };
+
+        function showLoading() {
+            loadingSpinner.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loadingSpinner.style.display = 'none';
+        }
+
+        function showAlert(title, message) {
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-message').innerText = message;
+            document.getElementById('custom-alert').classList.remove('hidden');
+
+            document.getElementById('alert-ok').onclick = () => {
+                document.getElementById('custom-alert').classList.add('hidden');
+            };
+        }
+    </script>
+</body>
+
+</html>

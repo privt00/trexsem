@@ -1,0 +1,38 @@
+{
+  "name": "trexsem",
+  "version": "0.1",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx electron .",
+    "build": "electron-builder build --win --linux",
+    "build:mac": "electron-builder build --mac",
+    "build:win": "electron-builder build --win",
+    "build:linux": "electron-builder build --linux",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "TrexSem Wallet - A simple cryptocurrency wallet for the PlutoCoins network - supporting both XPL and XRS.",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "electron": "^32.1.2",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.trexsem",
+    "productName": "TrexSem",
+    "mac": {
+      "icon": "build/icon.icns"
+    },
+    "win": {
+      "icon": "build/icon.ico"
+    },
+    "linux": {
+      "icon": "build/icon.png"
+    }
+  }
+}
