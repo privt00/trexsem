@@ -22,7 +22,6 @@ function createWindow() {
             preload: path.join(__dirname, 'preload.js'),
         },
     });
-
     mainWindow.loadFile('index.html');
     // mainWindow.webContents.openDevTools();
 }
@@ -106,12 +105,20 @@ ipcMain.handle('get-transactions', async (event, address) => {
     }
 });
 
-ipcMain.handle('transfer', async (event, transferData) => {
+ipcMain.handle('transfer-funds', async (event, signedTransaction) => {
+    const { senderAddress, receiverId, amount, currency } = signedTransaction;
+
+    if (!senderAddress || !receiverId || !amount || !currency) {
+        throw new Error('Missing required transaction fields.');
+    }
+    if (amount <= 0) {
+        throw new Error('Amount must be greater than zero.');
+    }
     try {
-        const response = await axios.post(`${API_BASE_URL}/external/transfer`, transferData);
+        const response = await axios.post(`${API_BASE_URL}/external/transfer`, signedTransaction);
         return response.data;
     } catch (error) {
-        console.error('Error transferring funds:', error);
-        throw new Error('Transfer failed. Please try again.');
+        console.error('Error in transfer-funds:', error.response ? error.response.data : error.message);
+        throw new Error(error.response && error.response.data ? error.response.data.message : 'Transfer failed. Please try again.');
     }
 });
