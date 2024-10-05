@@ -7,58 +7,37 @@
     <title>TreXsem 0.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background-color: #1F2937;
-        }
-
-        .topbar {
-            background-color: #1F2937;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            -webkit-app-region: drag;
-        }
-
-        .window-container {
-            background-color: #1F2937;
-            border-radius: 50px;
+        body {
+            border-radius: 12px;
+            overflow: hidden;
         }
 
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 50;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-            padding-top: 60px;
+            background-color: rgba(15, 23, 42, 0.8);
         }
 
         .modal-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: #fefefe;
-            margin: 5% auto 15% auto;
-            border: 1px solid #888;
-            width: 80%;
-            padding: 20px;
+            background-color: #1F2937;
+            color: white;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-in-out;
         }
 
         .loading-spinner {
-            display: none;
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
+            border-top-color: #4ade80;
             animation: spin 1s linear infinite;
         }
 
@@ -68,100 +47,125 @@
             }
         }
 
-        #close-app {
-            background-color: rgb(255, 65, 65);
-            color: white;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .container2 {
-            max-height: calc(100vh - 150px);
-            overflow-y: auto;
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: #10B981;
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            z-index: 40;
+        }
+
+        .fab:hover {
+            background-color: #059669;
+            transform: scale(1.05);
         }
     </style>
 </head>
 
-<body class="overflow-y-hidden">
-
-    <section class="windows-container text-gray-800 min-h-screen flex bg-neutral-900 rounded-lg" style="-webkit-user-drag: none;">
-
-        <div class="sidebar flex flex-col justify-between p-4 rounded-l-lg">
-            <div>
-                <h2 class="text-white text-lg font-semibold mb-4">Wallets</h2>
-                <div id="wallet-list" class="space-y-2"></div>
-            </div>
-            <button id="create-wallet-btn" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-2xl">
-                + Create Wallet
-            </button>
-        </div>
-
-        <div class="container mx-auto wallet-container flex-grow">
-            <div class="topbar w-full rounded-tr-lg">
-                <div class="flex justify-center">
-                    <img src="https://i.imgur.com/VVsFmn6.png" width="100" alt="TreXsem Logo">
+<body>
+    <section class="bg-gray-900 text-gray-200 font-sans rounded-lg">
+        <div class="flex h-screen rounded-lg overflow-hidden">
+            <aside class="w-64 bg-gray-800 flex flex-col justify-between p-6 rounded-l-lg">
+                <div>
+                    <h2 class="text-2xl font-semibold mb-6 text-teal-400">Wallets</h2>
+                    <div id="wallet-list" class="space-y-4">
+                    </div>
                 </div>
-                <div class="p-1" style="-webkit-app-region: no-drag">
-                    <button id="close-app" onclick="closeApp()" class="hover:bg-red-600 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+            </aside>
+
+            <main class="flex-grow bg-gray-900 overflow-y-auto p-8 rounded-r-lg">
+                <header class="flex justify-between items-center mb-8 bg-gray-800 p-4 rounded-lg shadow-md" style="-webkit-app-region: drag">
+                    <img src="https://i.imgur.com/VVsFmn6.png" alt="TreXsem Logo" class="w-32">
+                    <button id="close-app" class="bg-red-600 hover:bg-red-700 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl" style="-webkit-app-region: no-drag">
                         &times;
                     </button>
-                </div>
-            </div>
+                </header>
 
-            <div class="container2 p-6">
-
-                <div id="wallet-info" class="mb-8 bg-white p-6 rounded-lg shadow-lg hidden">
-                    <div id="balance-info" class="space-y-2"></div>
-                    <button id="refresh-balance" class="mt-4 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg shadow transition">
+                <section id="wallet-info" class="mb-8 bg-gray-800 p-6 rounded-lg shadow-lg hidden">
+                    <div id="balance-info" class="space-y-2">
+                    </div>
+                    <button id="refresh-balance" class="mt-4 bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg shadow transition">
                         Refresh Balance
                     </button>
-                </div>
+                </section>
 
-                <div id="transfer-form" class="mb-8 hidden">
-                    <h2 class="text-2xl text-neutral-400 font-bold mb-4 text-center">Transfer Funds</h2>
-                    <input id="receiver" type="text" placeholder="Receiver address" class="w-full bg-gray-50 border border-gray-300 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500">
-
-                    <input id="amount" type="number" placeholder="Amount" class="w-full bg-gray-50 border border-gray-300 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500">
-
-                    <select id="currency" class="w-full bg-gray-50 border border-gray-300 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <section id="transfer-form" class="mb-8 bg-gray-800 p-6 rounded-lg shadow-lg hidden">
+                    <h2 class="text-2xl font-bold mb-4 text-teal-400 text-center">Transfer Funds</h2>
+                    <input id="receiver" type="text" placeholder="Receiver Address" class="w-full bg-gray-700 border border-gray-600 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <input id="amount" type="number" placeholder="Amount" class="w-full bg-gray-700 border border-gray-600 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <select id="currency" class="w-full bg-gray-700 border border-gray-600 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500">
                         <option value="" disabled selected>Select Currency</option>
                         <option value="XPL">XPL</option>
                         <option value="XRS">XRS</option>
                     </select>
-
-                    <button id="transfer-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                    <button id="transfer-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition">
                         Transfer
                     </button>
-                </div>
+                </section>
 
-                <div id="transaction-history" class="mb-8 hidden">
-                    <h2 class="text-2xl text-neutral-400 font-bold mb-4 text-center">Transaction History</h2>
-                    <ul id="transactions-list" class="space-y-2"></ul>
-                </div>
+                <section id="transaction-history" class="mb-8 bg-gray-800 p-6 rounded-lg shadow-lg hidden">
+                    <h2 class="text-2xl font-bold mb-4 text-teal-400 text-center">Transaction History</h2>
+                    <ul id="transactions-list" class="space-y-4">
+                    </ul>
+                </section>
+            </main>
 
-                <div id="custom-alert" class="hidden fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-                    <div class="bg-white p-4 rounded-lg shadow-lg">
-                        <h3 id="alert-title" class="text-lg font-semibold"></h3>
-                        <p id="alert-message" class="text-gray-700"></p>
-                        <button id="alert-ok" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg mt-2">OK</button>
-                    </div>
-                </div>
-
-                <div id="loading-spinner" class="loading-spinner mx-auto"></div>
-
+            <div class="fab" id="open-create-wallet" aria-label="Create Wallet" role="button">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
             </div>
         </div>
 
-        <div id="wallet-name-modal" class="modal">
-            <div class="modal-content bg-white p-6 rounded-lg w-1/2">
-                <h2 class="text-xl font-bold mb-4">Enter Wallet Name</h2>
-                <input id="wallet-name" type="text" placeholder="Wallet Name" class="w-full bg-gray-50 border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                <div class="flex justify-end mt-4">
-                    <button id="confirm-wallet-name" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg">Create Wallet</button>
-                    <button id="close-modal" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg ml-2">Cancel</button>
+        <div id="wallet-name-modal" class="modal items-center justify-center min-h-screen">
+            <div class="modal-content">
+                <h2 class="text-2xl font-bold mb-4">Enter Wallet Name</h2>
+                <input id="wallet-name" type="text" placeholder="Wallet Name" class="w-full bg-gray-700 border border-gray-600 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <div class="flex justify-end space-x-2">
+                    <button id="confirm-wallet-name" class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg shadow transition">
+                        Create
+                    </button>
+                    <button id="close-modal" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow transition">
+                        Cancel
+                    </button>
                 </div>
             </div>
+        </div>
+
+        <div id="custom-alert" class="hidden fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-50">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+                <h3 id="alert-title" class="text-xl font-semibold mb-2"></h3>
+                <p id="alert-message" class="text-gray-300 mb-4"></p>
+                <button id="alert-ok" class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg shadow transition">
+                    OK
+                </button>
+            </div>
+        </div>
+
+        <div id="loading-spinner" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-40 hidden">
+            <div class="w-16 h-16 border-4 border-t-teal-500 border-gray-700 rounded-full animate-spin loading-spinner"></div>
         </div>
     </section>
 
@@ -173,7 +177,7 @@
             window.electron.invoke('close-app');
         };
 
-        const createWalletBtn = document.getElementById('create-wallet-btn');
+        const createWalletFab = document.getElementById('open-create-wallet');
         const walletNameModal = document.getElementById('wallet-name-modal');
         const confirmWalletName = document.getElementById('confirm-wallet-name');
         const closeModal = document.getElementById('close-modal');
@@ -185,23 +189,28 @@
         const refreshBalanceBtn = document.getElementById('refresh-balance');
 
         (async () => {
+            showLoading();
             try {
                 const wallets = await window.electron.invoke('load-wallets');
                 wallets.forEach(wallet => {
                     walletList.innerHTML += `
-                        <div class="bg-gray-800 text-white p-2 rounded-lg flex justify-between">
-                            <span>${wallet.name}</span>
-                            <button class="bg-red-600 text-white px-2 rounded-lg" data-address="${wallet.address}" data-private-key="${wallet.privateKey}">Load</button>
+                        <div class="flex justify-between items-center bg-gray-700 p-4 rounded-lg shadow-md">
+                            <span class="text-white">${wallet.name}</span>
+                            <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg shadow transition load-wallet-btn" data-address="${wallet.address}" data-private-key="${wallet.privateKey}">
+                                Load
+                            </button>
                         </div>
                     `;
                 });
             } catch (error) {
                 showAlert('Error', 'Failed to load wallets.');
+            } finally {
+                hideLoading();
             }
         })();
 
-        createWalletBtn.onclick = () => {
-            walletNameModal.style.display = 'block';
+        createWalletFab.onclick = () => {
+            walletNameModal.style.display = 'flex';
         };
 
         closeModal.onclick = () => {
@@ -219,9 +228,11 @@
             try {
                 const wallet = await window.electron.invoke('create-wallet', walletName);
                 walletList.innerHTML += `
-                    <div class="bg-gray-800 text-white p-2 rounded-lg flex justify-between">
-                        <span>${wallet.name}</span>
-                        <button class="bg-red-600 text-white px-2 rounded-lg" data-address="${wallet.address}" data-private-key="${wallet.privateKey}">Load</button>
+                    <div class="flex justify-between items-center bg-gray-700 p-4 rounded-lg shadow-md">
+                        <span class="text-white">${wallet.name}</span>
+                        <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg shadow transition load-wallet-btn" data-address="${wallet.address}" data-private-key="${wallet.privateKey}">
+                            Load
+                        </button>
                     </div>
                 `;
                 document.getElementById('wallet-name').value = '';
@@ -233,8 +244,8 @@
             }
         };
 
-        walletList.onclick = async (event) => {
-            if (event.target.matches('[data-address]')) {
+        walletList.addEventListener('click', async (event) => {
+            if (event.target.classList.contains('load-wallet-btn')) {
                 const address = event.target.getAttribute('data-address');
                 const privateKey = event.target.getAttribute('data-private-key');
                 showLoading();
@@ -249,17 +260,29 @@
                     hideLoading();
                 }
             }
-        };
+        });
 
         function displayWalletInfo(wallet) {
             const walletInfo = document.getElementById('wallet-info');
             const balanceInfo = document.getElementById('balance-info');
             balanceInfo.innerHTML = `
-                <h3 class="font-semibold">Wallet Address:</h3>
-                <p>${wallet.address}</p>
-                <h3 class="font-semibold">Balance:</h3>
-                <p>${wallet.xpl} XPL</p>
-                <p>${wallet.xrs} XRS</p>
+                <div>
+                    <h3 class="font-semibold">Wallet Address:</h3>
+                    <p class="text-teal-400">${wallet.address}</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold">Balance:</h3>
+                <div class="flex space-x-4">
+                    <div class="flex-1 bg-orange-500 p-4 rounded-lg shadow-md">
+                        <h3 class="font-semibold text-lg">XPL Balance</h3>
+                        <p class="text-white text-2xl">${wallet.xpl} XPL</p>
+                    </div>
+                    <div class="flex-1 bg-blue-500 p-4 rounded-lg shadow-md">
+                        <h3 class="font-semibold text-lg">XRS Balance</h3>
+                        <p class="text-white text-2xl">${wallet.xrs} XRS</p>
+                    </div>
+                </div>
+                </div>
             `;
             walletInfo.classList.remove('hidden');
             transferForm.classList.remove('hidden');
@@ -283,10 +306,10 @@
             transactionsList.innerHTML = '';
             transactions.forEach(tx => {
                 transactionsList.innerHTML += `
-                    <li class="bg-gray-800 text-white p-2 rounded-lg">
-                        <strong>Sender:</strong> ${tx.senderId} <br>
-                        <strong>Amount:</strong> ${tx.amount} ${tx.currency} <br>
-                        <strong>Date:</strong>  ${new Date(tx.timestamp).toLocaleString()}
+                    <li class="bg-gray-700 p-4 rounded-lg shadow-md">
+                        <p><strong>Sender:</strong> ${tx.senderId}</p>
+                        <p><strong>Amount:</strong> ${tx.amount} ${tx.currency}</p>
+                        <p><strong>Date:</strong> ${new Date(tx.timestamp).toLocaleString()}</p>
                     </li>
                 `;
             });
@@ -300,7 +323,7 @@
             const currency = document.getElementById('currency').value;
 
             if (!receiverId || isNaN(amount) || !currency) {
-                showAlert('Error', 'Please enter a receiver address, amount, and select a currency.');
+                showAlert('Error', 'Please enter receiver address, amount, and select a currency.');
                 return;
             }
 
@@ -340,11 +363,11 @@
         };
 
         function showLoading() {
-            loadingSpinner.style.display = 'block';
+            loadingSpinner.classList.remove('hidden');
         }
 
         function hideLoading() {
-            loadingSpinner.style.display = 'none';
+            loadingSpinner.classList.add('hidden');
         }
 
         function showAlert(title, message) {

@@ -1,7 +1,7 @@
 directories:
   output: dist
   buildResources: build
-appId: com.trexsem.wallet
+appId: com.trexsem
 productName: TrexSem
 mac:
   icon: build/icon.icns

@@ -11,7 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "privt00",
   "license": "ISC",
   "description": "TrexSem Wallet - A simple cryptocurrency wallet for the PlutoCoins network - supporting both XPL and XRS.",
   "dependencies": {
